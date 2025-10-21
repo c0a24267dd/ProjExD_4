@@ -203,6 +203,24 @@ class Explosion(pg.sprite.Sprite):
             self.kill()
 
 
+class Gravity(pg.sprite.Sprite):
+    """
+    重力場に関するクラス
+    """
+    def __init__(self, life: int):
+        super().__init__()
+        self.image = pg.Surface((1100, 650))
+        pg.draw.rect(self.image, (0, 0, 0), pg.Rect(0, 0, 1100, 650))
+        self.image.set_alpha(128)
+        self.rect = self.image.get_rect(topleft=(0, 0))
+        self.life = life
+
+    def update(self):
+        self.life -= 1
+        if self.life < 0:
+            self.kill()
+
+
 class Enemy(pg.sprite.Sprite):
     """
     敵機に関するクラス
@@ -240,7 +258,7 @@ class Score:
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
-        self.value = 0
+        self.value = 400
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
@@ -260,10 +278,12 @@ def main():
     bombs = pg.sprite.Group()
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
+    gravitys = pg.sprite.Group()
     emys = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
+    
     while True:
         key_lst = pg.key.get_pressed()
         for event in pg.event.get():
@@ -271,6 +291,10 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                if score.value >= 200 and len(gravitys) == 0:
+                    gravitys.add(Gravity(life=400))
+                    score.value -= 200 
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -296,6 +320,18 @@ def main():
             pg.display.update()
             time.sleep(2)
             return
+        
+        gravitys.update()
+        if len(gravitys) > 0: 
+            hit_bombs = pg.sprite.groupcollide(bombs, gravitys, True, False) #重力場と爆弾の衝突判定
+            for bomb in hit_bombs.keys():
+                exps.add(Explosion(bomb, 50))
+                score.value += 1
+                
+            hit_emys = pg.sprite.groupcollide(emys, gravitys, True, False) #重力場と敵の衝突判定
+            for emy in hit_emys.keys():
+                exps.add(Explosion(emy, 100))
+                score.value += 10
 
         bird.update(key_lst, screen)
         beams.update()
@@ -306,6 +342,7 @@ def main():
         bombs.draw(screen)
         exps.update()
         exps.draw(screen)
+        gravitys.draw(screen)
         score.update(screen)
         pg.display.update()
         tmr += 1
