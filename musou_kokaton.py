@@ -15,7 +15,7 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内or画面外を判定し，真理値タプルを返す関数
     引数：こうかとんや爆弾，ビームなどのRect
-    戻り値：横方向，縦方向のはみ出し判定結果（画面内：True／画面外：False）
+    戻り値：横方向，縦方向のはみ出し判定結果（画面内：True/画面外：False）
     """
     yoko, tate = True, True
     if obj_rct.left < 0 or WIDTH < obj_rct.right:
@@ -256,7 +256,7 @@ class EMP(pg.sprite.Sprite):
         self.image.fill((255, 255, 0))
         self.image.set_alpha(128)  # 半透明
         self.rect = self.image.get_rect()
-        self.life = 3  # 約0.05秒（50fps基準）
+        self.life = 3  # 約0.05秒
         self.emys = emys
         self.bombs = bombs
         self.screen = screen
@@ -303,7 +303,7 @@ def main():
                 if event.key == pg.K_SPACE:
                     beams.add(Beam(bird))
                 if event.key == pg.K_e and score.value > 20: #EMPの発動条件
-                    score.value -= 20
+                    score.value -= 20 # 消費スコア：20
                     emps.add(EMP(emys, bombs, screen))
 
         screen.blit(bg_img, [0, 0])
