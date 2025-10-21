@@ -72,7 +72,7 @@ class Bird(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = xy
         self.defaultspeed = 10
-        self.highspeed = 20
+        self.highspeed = 20 #speedの変更
         self.speed = self.defaultspeed
 
     def change_img(self, num: int, screen: pg.Surface):
@@ -96,14 +96,11 @@ class Bird(pg.sprite.Sprite):
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
 
-        if key_lst[pg.K_LSHIFT]:
+        if key_lst[pg.K_LSHIFT]: #実装機能1
                 self.speed = self.highspeed
         else:
             self.speed = self.defaultspeed
 
-            # hspeed = pg.key.get_pressed()
-            # if hspeed[pg.K_LSHIFT]:
-            #     self.speed = 30
         self.rect.move_ip(self.speed*sum_mv[0], self.speed*sum_mv[1])
         if check_bound(self.rect) != (True, True):
             self.rect.move_ip(-self.speed*sum_mv[0], -self.speed*sum_mv[1])
